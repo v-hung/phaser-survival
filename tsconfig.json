@@ -1,6 +1,7 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
+    "target": "esnext",
 		"allowJs": true,
 		"checkJs": true,
 		"esModuleInterop": true,
@@ -10,11 +11,12 @@
 		"sourceMap": true,
 		"strict": true,
     "typeRoots": [
-      "./node_modules/phaser/types"
-    ],
-    "types": [
-      "Phaser"
-    ],
+			"node_modules/@types",
+			"node_module/phaser/types"
+		],
+		"types": [
+			"Phaser"
+		],
     "strictPropertyInitialization": false
 	}
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias

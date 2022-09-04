@@ -10,7 +10,7 @@
     type: Phaser.AUTO,
     width: 512,
     height: 512,
-    backgroundColor: '#333',  
+    backgroundColor: '#999',  
     parent: 'game',
     scene: [MainScene],
     scale: {

@@ -16,6 +16,7 @@
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/kit": "next",
 		"@types/cookie": "^0.5.1",
+		"@types/matter-js": "^0.18.1",
 		"autoprefixer": "^10.4.8",
 		"postcss": "^8.4.16",
 		"prettier": "^2.6.2",
@@ -32,7 +33,7 @@
 	"dependencies": {
 		"@fontsource/fira-mono": "^4.5.0",
 		"cookie": "^0.4.1",
-		"phaser": "^3.55.2",
+		"phaser": "^3.60.0-beta.9",
 		"phaser-matter-collision-plugin": "^1.0.0"
 	}
 }
