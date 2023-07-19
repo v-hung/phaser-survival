@@ -23,6 +23,7 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"phaser": "^3.60.0"
+		"phaser": "^3.60.0",
+		"tile-extruder": "^2.1.0"
 	}
 }

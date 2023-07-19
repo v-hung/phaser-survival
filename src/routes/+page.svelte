@@ -13,7 +13,7 @@
     // backgroundColor: '#999',  
     parent: 'game',
     scale: {
-      zoom: 2,
+      zoom: 3,
     },
     physics: {
       default: 'arcade',

@@ -40,7 +40,7 @@ export class MainScene extends Scene {
     })
 
     this.moi = this.physics.add.sprite(128, 128, 'moi', 'idle1.png')
-    // this.knight.body?.setSize(this.knight.width, this.knight.height)
+    this.moi.body?.setSize(this.moi.width * .3, this.moi.height * .4)
 
     this.anims.create({
       key: 'moi-idle',
@@ -92,27 +92,38 @@ export class MainScene extends Scene {
 
     const speed = 100
 
+    let x = 0,
+        y = 0
+
     if (this.cursors.left.isDown) {
-      this.moi.anims.play('moi-run', true)
-      this.moi.setVelocity(-speed, 0)
+      x -= 1
+      // this.moi.anims.play('moi-run', true)
+      // this.moi.setVelocity(-speed, 0)
 
-      this.moi.scaleX = -1
-      this.moi.body!.offset.x = 20
+      // this.moi.scaleX = -1
+      // this.moi.body!.offset.x = 20
     }
-    else if (this.cursors.right.isDown) {
-      this.moi.anims.play('moi-run', true)
-      this.moi.setVelocity(speed, 0)
+    if (this.cursors.right.isDown) {
+      x += 1
+      // this.moi.anims.play('moi-run', true)
+      // this.moi.setVelocity(speed, 0)
 
-      this.moi.scaleX = 1
-      this.moi.body!.offset.x = 0
+      // this.moi.scaleX = 1
+      // this.moi.body!.offset.x = 0
     }
-    else if (this.cursors.up.isDown) {
-      this.moi.anims.play('moi-run', true)
-      this.moi.setVelocity(0, -speed)
+    if (this.cursors.up.isDown) {
+      y -= 1
+      // this.moi.anims.play('moi-run', true)
+      // this.moi.setVelocity(0, -speed)
     }
-    else if (this.cursors.down.isDown) {
+    if (this.cursors.down.isDown) {
+      y += 1
+      // this.moi.anims.play('moi-run', true)
+      // this.moi.setVelocity(0, speed)
+    }
+    if (x !=0 || y != 0) {
       this.moi.anims.play('moi-run', true)
-      this.moi.setVelocity(0, speed)
+      this.moi.setVelocity(x * speed, y * speed)
     }
     else {
       this.moi.anims.play('moi-idle', true)
