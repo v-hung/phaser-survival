@@ -8,7 +8,8 @@
     ],
     "fileStates": {
         "": {
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "Tiles.tmx": {
             "scaleInDock": 1,
@@ -21,10 +22,10 @@
         },
         "untitled.tmx": {
             "scale": 1,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 493.5,
-                "y": 218
+                "x": 492.5,
+                "y": 214
             }
         },
         "untitled.tmx#Props": {

@@ -1,89 +1,99 @@
-import type * as MatterType from "matter-js";
+import { Physics, Scene, type Types } from "phaser"
 
-// @ts-ignore: Property 'Matter' does not exist on type 'typeof Matter'.
-const MatterJS: typeof MatterType = Phaser.Physics.Matter.Matter;
-export class Player extends Phaser.Physics.Matter.Sprite {
-  move_x: null | 'left' | 'right'
-  move_y: null | 'top' | 'bot'  = null
+type PlayerType = {
+  scene: Scene,
+  x: number,
+  y: number,
+}
 
-  constructor(data: any) {
-    let {scene,x,y,texture, frame} = data
-    super(scene.matter.world,x,y,texture,frame)
-    this.scene.add.existing(this)
+export class Player extends Physics.Arcade.Sprite {
 
-    const {Body, Bodies} = MatterJS
-    var player_collider = Bodies.circle(this.x, this.y, 9, {isSensor:false, label: 'player_collider'})
-    var player_sensor = Bodies.circle(this.x, this.y, 24, {isSensor:true, label: 'player_sensor'})
-    const compoundBody = Body.create({
-      parts: [player_collider, player_sensor],
-      frictionAir: 0.35,
+  constructor(data: PlayerType) {
+    let {scene, x, y} = data
+
+    super(scene,x,y, 'moi')
+    scene.add.existing(this)
+
+    scene.physics.world.enable(this);
+    this.setSize(this.width * 0.3, this.height * 0.3)
+
+    this.create()
+  }
+
+  create() {
+    this.scene.anims.create({
+      key: 'moi-idle',
+      frames: this.scene.anims.generateFrameNames('moi', {
+        start: 1,
+        end: 6,
+        prefix: 'idle',
+        suffix: '.png'
+      }),
+      repeat: -1,
+      frameRate: 10
     })
 
-    this.setExistingBody(compoundBody)
-    this.setFixedRotation()
-    console.log('constructor')
+    this.scene.anims.create({
+      key: 'moi-attack1',
+      frames: this.scene.anims.generateFrameNames('moi', {
+        start: 1,
+        end: 5,
+        prefix: 'attack1',
+        suffix: '.png'
+      }),
+      repeat: -1,
+      frameRate: 10
+    })
+
+    this.scene.anims.create({
+      key: 'moi-run',
+      frames: this.scene.anims.generateFrameNames('moi', {
+        start: 1,
+        end: 6,
+        prefix: 'run',
+        suffix: '.png'
+      }),
+      repeat: -1,
+      frameRate: 10
+    })
+
+    this.anims.play('moi-idle')
   }
 
-  static preload(scene: any) {
-    console.log('preload')
-    scene.load.atlas('walk_anim_sheet', 'images/walk_anim_sheet.png', 'images/walk_anim_sheet_atlas.json')
-    scene.load.animation('walk_anim_sheet_anim', 'images/walk_anim_sheet_anim.json')
+  static preload(scene: Scene) {
+    scene.load.atlas('moi', 'characters/moi.png', 'characters/moi.json')
   }
 
-  update(input_keys: any) {
-    const speed = 2.5
-    let player_velocity = new Phaser.Math.Vector2()
-    
-    if (input_keys.left.isDown) {
-      player_velocity.x = -1
-      this.move_x = 'left'
-    } 
-    else if (input_keys.right.isDown) {
-      player_velocity.x = 1
-      this.move_x = 'right'
-    }
+  update(cursors: any) {
+    const speed = 100
 
-    if (input_keys.up.isDown) {
-      player_velocity.y = -1
-      this.move_y = 'top'
-    } 
-    else if (input_keys.down.isDown) {
-      player_velocity.y = 1
-      this.move_y = 'bot'
-    }
+    if (cursors.left.isDown) {
+      this.anims.play('moi-run', true)
+      this.setVelocity(-speed, 0)
 
-    // set animation
-    if (this.move_x == 'left' && !this.move_y) {
-      this.anims.play('walk_left', true)
+      this.scaleX = -1
+      this.body!.offset.x = 31
     }
-    else if (this.move_x == 'left' && this.move_y == 'top') {
-      this.anims.play('walk_top_left', true)
-    }
-    else if (this.move_x == 'left' && this.move_y == 'bot') {
-      this.anims.play('walk_bot_left', true)
-    }
-    else if (this.move_x == 'right' && !this.move_y) {
-      this.anims.play('walk_right', true)
-    }
-    else if (this.move_x == 'right' && this.move_y == 'top') {
-      this.anims.play('walk_top_right', true)
-    }
-    else if (this.move_x == 'right' && this.move_y == 'bot') {
-      this.anims.play('walk_bot_right', true)
-    }
-    else if (!this.move_x && this.move_y == 'top') {
-      this.anims.play('walk_top', true)
-    }
-    else if (!this.move_x && this.move_y == 'bot') {
-      this.anims.play('walk_bot', true)
-    }
+    else if (cursors.right.isDown) {
+      this.anims.play('moi-run', true)
+      this.setVelocity(speed, 0)
 
-    player_velocity.normalize()
-    player_velocity.scale(speed)
-    this.setVelocity(player_velocity.x, player_velocity.y)
-
-    if (Math.abs(this.body.velocity.x) < 0.1 && Math.abs(this.body.velocity.y) < 0.1) {
-      this.anims.stop()
+      this.scaleX = 1
+      this.body!.offset.x = 17
+    }
+    else if (cursors.up.isDown) {
+      this.anims.play('moi-run', true)
+      this.setVelocity(0, -speed)
+    }
+    else if (cursors.down.isDown) {
+      this.anims.play('moi-run', true)
+      this.setVelocity(0, speed)
+    }
+    else {
+      this.anims.play('moi-idle', true)
+      // const parts = this.anims.currentAnim?.key.split('run')
+      // this.anims.stop()
+      this.setVelocity(0, 0)
     }
   }
 }

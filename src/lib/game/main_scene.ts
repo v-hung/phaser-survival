@@ -1,10 +1,13 @@
 import { Display, GameObjects, Physics, Scene, type Types } from "phaser";
+import { Player } from "./player";
+import { Enemy } from "./enemy";
 // import { Player } from "./player";
 
 
 export class MainScene extends Scene {
   private cursors?: Types.Input.Keyboard.CursorKeys
   private moi?: Physics.Arcade.Sprite
+  private enemy?: Physics.Arcade.Sprite
 
   constructor ()
   {
@@ -15,7 +18,9 @@ export class MainScene extends Scene {
   {
     this.load.image('tiles', 'tiles/dungeon/Tiles.png');
     this.load.tilemapTiledJSON('dungeon', 'tiles/dungeon/map.json')
-    this.load.atlas('moi', 'characters/moi.png', 'characters/moi.json')
+    // this.load.atlas('moi', 'characters/moi.png', 'characters/moi.json')
+    Player.preload(this)
+    Enemy.preload(this)
 
     this.cursors = this.input.keyboard?.createCursorKeys()
   }
@@ -39,97 +44,23 @@ export class MainScene extends Scene {
       faceColor: new Display.Color(40,39,37,255)
     })
 
-    this.moi = this.physics.add.sprite(128, 128, 'moi', 'idle1.png')
-    this.moi.body?.setSize(this.moi.width * .3, this.moi.height * .4)
-
-    this.anims.create({
-      key: 'moi-idle',
-      frames: this.anims.generateFrameNames('moi', {
-        start: 1,
-        end: 6,
-        prefix: 'idle',
-        suffix: '.png'
-      }),
-      repeat: -1,
-      frameRate: 10
-    })
-
-    this.anims.create({
-      key: 'moi-attack1',
-      frames: this.anims.generateFrameNames('moi', {
-        start: 1,
-        end: 5,
-        prefix: 'attack1',
-        suffix: '.png'
-      }),
-      repeat: -1,
-      frameRate: 10
-    })
-
-    this.anims.create({
-      key: 'moi-run',
-      frames: this.anims.generateFrameNames('moi', {
-        start: 1,
-        end: 6,
-        prefix: 'run',
-        suffix: '.png'
-      }),
-      repeat: -1,
-      frameRate: 10
-    })
-
-    this.moi.anims.play('moi-idle')
-
+    this.moi = new Player({scene: this, x:300, y:128})
     this.physics.add.collider(this.moi, wallsLayer!)
+
+    this.enemy = new Enemy({scene: this, x:200, y:128})
+    this.physics.add.collider(this.enemy, wallsLayer!)
+
+    // this.physics.add.collider(this.moi, this.enemy)
 
     this.cameras.main.startFollow(this.moi, true)
   }
 
   update(time: number, delta: number): void {
-    if (!this.cursors || !this.moi) {
-      return
+    if (this.cursors && this.moi) {
+      this.moi.update(this.cursors)
     }
 
-    const speed = 100
+    this.enemy?.update(this.moi)
 
-    let x = 0,
-        y = 0
-
-    if (this.cursors.left.isDown) {
-      x -= 1
-      // this.moi.anims.play('moi-run', true)
-      // this.moi.setVelocity(-speed, 0)
-
-      // this.moi.scaleX = -1
-      // this.moi.body!.offset.x = 20
-    }
-    if (this.cursors.right.isDown) {
-      x += 1
-      // this.moi.anims.play('moi-run', true)
-      // this.moi.setVelocity(speed, 0)
-
-      // this.moi.scaleX = 1
-      // this.moi.body!.offset.x = 0
-    }
-    if (this.cursors.up.isDown) {
-      y -= 1
-      // this.moi.anims.play('moi-run', true)
-      // this.moi.setVelocity(0, -speed)
-    }
-    if (this.cursors.down.isDown) {
-      y += 1
-      // this.moi.anims.play('moi-run', true)
-      // this.moi.setVelocity(0, speed)
-    }
-    if (x !=0 || y != 0) {
-      this.moi.anims.play('moi-run', true)
-      this.moi.setVelocity(x * speed, y * speed)
-    }
-    else {
-      this.moi.anims.play('moi-idle', true)
-      // const parts = this.moi.anims.currentAnim?.key.split('run')
-      // this.moi.anims.stop()
-      this.moi.setVelocity(0, 0)
-    }
   }
 }
