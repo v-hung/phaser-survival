@@ -9,7 +9,7 @@
   let config: Phaser.Types.Core.GameConfig = {
     type: AUTO,
     width: 400,
-    height: 250,
+    height: 300,
     // backgroundColor: '#999',  
     parent: 'game',
     scale: {
@@ -19,7 +19,7 @@
       default: 'arcade',
       arcade: {
         gravity: { y: 0 },
-        debug: true
+        // debug: true
       }
     },
     scene: [MainScene],

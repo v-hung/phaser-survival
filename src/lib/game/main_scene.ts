@@ -6,8 +6,8 @@ import { Enemy } from "./enemy";
 
 export class MainScene extends Scene {
   private cursors?: Types.Input.Keyboard.CursorKeys
-  private moi?: Physics.Arcade.Sprite
-  private enemy?: Physics.Arcade.Sprite
+  private player?: Player
+  private enemy?: Enemy
 
   constructor ()
   {
@@ -37,30 +37,36 @@ export class MainScene extends Scene {
 
     wallsLayer?.setCollisionByProperty({ collides: true })
 
-    const debugGraphics = this.add.graphics().setAlpha(.7)
-    wallsLayer?.renderDebug(debugGraphics, {
-      tileColor: null,
-      collidingTileColor: new Display.Color(243,243,48,255),
-      faceColor: new Display.Color(40,39,37,255)
-    })
+    // const debugGraphics = this.add.graphics().setAlpha(.7)
+    // wallsLayer?.renderDebug(debugGraphics, {
+    //   tileColor: null,
+    //   collidingTileColor: new Display.Color(243,243,48,255),
+    //   faceColor: new Display.Color(40,39,37,255)
+    // })
 
-    this.moi = new Player({scene: this, x:300, y:128})
-    this.physics.add.collider(this.moi, wallsLayer!)
+    this.player = new Player({scene: this, x:120, y:128})
+    this.physics.add.collider(this.player, wallsLayer!)
 
     this.enemy = new Enemy({scene: this, x:200, y:128})
     this.physics.add.collider(this.enemy, wallsLayer!)
 
-    // this.physics.add.collider(this.moi, this.enemy)
+    this.physics.add.overlap(this.player.swordHitBox, this.enemy, 
+      (swordHitBox, enemy) => this.enemy?.enemyHurt(swordHitBox, enemy, this.player!), undefined, this)
+    
+    this.physics.add.overlap(this.enemy.swordHitBox, this.player, 
+      (swordHitBox, player) => this.player?.playerHurt(swordHitBox, player, this.enemy!), undefined, this)
 
-    this.cameras.main.startFollow(this.moi, true)
+    this.cameras.main.startFollow(this.player, true)
   }
 
   update(time: number, delta: number): void {
-    if (this.cursors && this.moi) {
-      this.moi.update(this.cursors)
+    if (this.cursors && this.player) {
+      this.player.update(this.cursors)
     }
 
-    this.enemy?.update(this.moi)
+    if (this.enemy) {
+      this.enemy.update(this.player!)
+    }
 
   }
 }
