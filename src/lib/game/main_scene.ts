@@ -1,4 +1,4 @@
-import { Display, GameObjects, Physics, Scene, type Types } from "phaser";
+import { Display, GameObjects, Physics, Scene, Tilemaps, type Types } from "phaser";
 import { Player } from "./player";
 import { Enemy } from "./enemy";
 // import { Player } from "./player";
@@ -7,7 +7,8 @@ import { Enemy } from "./enemy";
 export class MainScene extends Scene {
   private cursors?: Types.Input.Keyboard.CursorKeys
   private player?: Player
-  private enemy?: Enemy
+  private enemies: Enemy[] = []
+  private wallsLayer!: Tilemaps.TilemapLayer | null
 
   constructor ()
   {
@@ -32,10 +33,10 @@ export class MainScene extends Scene {
 
     if (!tileset) return
 
-    map?.createLayer('Ground', tileset)
-    const wallsLayer = map.createLayer('Walls', tileset)
+    map.createLayer('Ground', tileset)
+    this.wallsLayer = map.createLayer('Walls', tileset)
 
-    wallsLayer?.setCollisionByProperty({ collides: true })
+    this.wallsLayer?.setCollisionByProperty({ collides: true })
 
     // const debugGraphics = this.add.graphics().setAlpha(.7)
     // wallsLayer?.renderDebug(debugGraphics, {
@@ -45,28 +46,41 @@ export class MainScene extends Scene {
     // })
 
     this.player = new Player({scene: this, x:120, y:128})
-    this.physics.add.collider(this.player, wallsLayer!)
+    // this.matter.add.collider(this.player, this.wallsLayer!)
 
-    this.enemy = new Enemy({scene: this, x:200, y:128})
-    this.physics.add.collider(this.enemy, wallsLayer!)
-
-    this.physics.add.overlap(this.player.swordHitBox, this.enemy, 
-      (swordHitBox, enemy) => this.enemy?.enemyHurt(swordHitBox, enemy, this.player!), undefined, this)
-    
-    this.physics.add.overlap(this.enemy.swordHitBox, this.player, 
-      (swordHitBox, player) => this.player?.playerHurt(swordHitBox, player, this.enemy!), undefined, this)
+    // this.createEnemy(200, 128)
+    // this.createEnemy(220, 128)
+    // this.createEnemy(200, 100)
+    // this.createEnemy(220, 100)
 
     this.cameras.main.startFollow(this.player, true)
+    // this.cameras.main;
+  }
+
+  createEnemy = (x: number, y: number) => {
+    const currentEnemy = new Enemy({scene: this, x:x, y:y})
+    this.enemies.push(currentEnemy)
+    this.physics.add.collider(currentEnemy, this.wallsLayer!)
+
+    this.physics.add.overlap(this.player!.swordHitBox, currentEnemy, 
+      (swordHitBox, enemy) => currentEnemy?.enemyHurt(swordHitBox, enemy, this.player!), undefined, this)
+    
+    this.physics.add.overlap(currentEnemy.swordHitBox, this.player!, 
+      (swordHitBox, player) => this.player?.playerHurt(swordHitBox, player, currentEnemy!), undefined, this)
   }
 
   update(time: number, delta: number): void {
     if (this.cursors && this.player) {
-      this.player.update(this.cursors)
+      this.player.update(this.cursors, delta)
     }
 
-    if (this.enemy) {
-      this.enemy.update(this.player!)
-    }
-
+    // const enemiesArray = this.enemies;
+    // if (enemiesArray) {
+    //   for (const enemy of enemiesArray) {
+    //     if (enemy instanceof Enemy) {
+    //       enemy.update(this.player!);
+    //     }
+    //   }
+    // }
   }
 }

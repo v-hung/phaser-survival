@@ -9,6 +9,8 @@ type EnemyType = {
 }
 
 export class Enemy extends Physics.Arcade.Sprite {
+  private mainScene!: MainScene
+
   private currentWidth = 0
   private currentHeight = 0
   private posX!: number;
@@ -29,7 +31,9 @@ export class Enemy extends Physics.Arcade.Sprite {
     super(scene,x,y, 'pig-small')
     scene.add.existing(this)
 
-    scene.physics.world.enable(this);
+    scene.physics.world.enable(this)
+    this.mainScene = scene
+
     this.currentWidth = this.width * 0.18
     this.currentHeight = this.height * 0.6
     this.setSize(this.currentWidth, this.currentHeight)
@@ -53,56 +57,64 @@ export class Enemy extends Physics.Arcade.Sprite {
   }
 
   createAnimations() {
-    this.scene.anims.create({
-      key: 'pig-small-idle',
-      frames: this.scene.anims.generateFrameNames('pig-small', {
-        start: 3,
-        end: 6,
-        prefix: 'idle',
-        suffix: '.png'
-      }),
-      // repeat: -1,
-      frameRate: 10
-    })
+    if (!this.scene.anims.exists('pig-small-idle')) {
+      this.scene.anims.create({
+        key: 'pig-small-idle',
+        frames: this.scene.anims.generateFrameNames('pig-small', {
+          start: 3,
+          end: 6,
+          prefix: 'idle',
+          suffix: '.png'
+        }),
+        // repeat: -1,
+        frameRate: 10
+      })
+    }
 
-    this.scene.anims.create({
-      key: 'pig-small-attack',
-      frames: this.scene.anims.generateFrameNames('pig-small', {
-        start: 1,
-        end: 5,
-        prefix: 'attack',
-        suffix: '.png'
-      }),
-      // repeat: -1,
-      frameRate: 10
-    })
+    if (!this.scene.anims.exists('pig-small-attack')) {
+      this.scene.anims.create({
+        key: 'pig-small-attack',
+        frames: this.scene.anims.generateFrameNames('pig-small', {
+          start: 1,
+          end: 5,
+          prefix: 'attack',
+          suffix: '.png'
+        }),
+        // repeat: -1,
+        frameRate: 10
+      })
+    }
 
-    this.scene.anims.create({
-      key: 'pig-small-run',
-      frames: this.scene.anims.generateFrameNames('pig-small', {
-        start: 1,
-        end: 6,
-        prefix: 'run',
-        suffix: '.png'
-      }),
-      // repeat: -1,
-      frameRate: 20
-    })
+    if (!this.scene.anims.exists('pig-small-run')) {
+      this.scene.anims.create({
+        key: 'pig-small-run',
+        frames: this.scene.anims.generateFrameNames('pig-small', {
+          start: 1,
+          end: 6,
+          prefix: 'run',
+          suffix: '.png'
+        }),
+        // repeat: -1,
+        frameRate: 20
+      })
+    }
 
-    this.scene.anims.create({
-      key: 'pig-small-hurt',
-      frames: this.scene.anims.generateFrameNames('pig-small', {
-        start: 1,
-        end: 6,
-        prefix: 'hurt',
-        suffix: '.png'
-      }),
-      // repeat: -1,
-      frameRate: 20
-    })
+    if (!this.scene.anims.exists('pig-small-hurt')) {
+      this.scene.anims.create({
+        key: 'pig-small-hurt',
+        frames: this.scene.anims.generateFrameNames('pig-small', {
+          start: 1,
+          end: 6,
+          prefix: 'hurt',
+          suffix: '.png'
+        }),
+        // repeat: -1,
+        frameRate: 20
+      })
+    }
   }
 
-  static preload(scene: Scene) {
+  static preload(scene: MainScene) {
     scene.load.atlas('pig-small', 'enemy/pig-small.png', 'enemy/pig-small.json')
   }
 
@@ -221,8 +233,6 @@ export class Enemy extends Physics.Arcade.Sprite {
     this.hp -= Math.floor(Math.random() * (60 - 30 + 1) + 30)
     this.enemyAttackStop()
 
-    console.log(this.hp)
-
     const pushBackSpeed = 100; 
     const pushBackDuration = 300;
 
@@ -235,6 +245,9 @@ export class Enemy extends Physics.Arcade.Sprite {
       
       if (this.hp <= 0) {
         this.destroy()
+        setTimeout(() => {
+          this.mainScene.createEnemy(this.posX, this.posY)
+        }, 60000);
       }
     }, [], this);
 

@@ -25,12 +25,14 @@ export class Player extends Physics.Arcade.Sprite {
     scene.add.existing(this)
 
     scene.physics.world.enable(this);
-    this.currentWidth = this.width * 0.3
-    this.currentHeight = this.height * 0.3
-    this.setSize(this.currentWidth, this.currentHeight)
+    // this.currentWidth = this.width * 0.3
+    // this.currentHeight = this.height * 0.3
+    // this.setSize(this.currentWidth, this.currentHeight)
+
+    // this.setScale(2)
 
     this.swordHitBox = scene.add.rectangle(0, 0, this.currentWidth, this.currentHeight + 5 , 0xfff, 0)
-    scene.physics.add.existing(this.swordHitBox)
+    // scene.physics.add.existing(this.swordHitBox)
     if (this.swordHitBox.body instanceof Physics.Arcade.Body 
       || this.swordHitBox.body instanceof Physics.Arcade.StaticBody) {
       this.swordHitBox.body.enable = false
@@ -77,7 +79,7 @@ export class Player extends Physics.Arcade.Sprite {
       key: 'moi-hurt',
       frames: this.scene.anims.generateFrameNames('moi', {
         start: 1,
-        end: 6,
+        end: 4,
         prefix: 'hurt',
         suffix: '.png'
       }),
@@ -102,17 +104,36 @@ export class Player extends Physics.Arcade.Sprite {
     scene.load.atlas('moi', 'characters/moi.png', 'characters/moi.json')
   }
 
-  update(cursors: Types.Input.Keyboard.CursorKeys) {
+  update(cursors: Types.Input.Keyboard.CursorKeys, delta: number) {
+    // const speed =50
+    if (cursors.left.isDown) {
+      this.setVelocityX(-50)
+    }
+    else if (cursors.right.isDown) {
+      this.setVelocityX(50)
+    }
+    else if (cursors.up.isDown) {
+      this.setVelocityY(-50)
+    }
+    else if (cursors.down.isDown) {
+      this.setVelocityY(50)
+    }
+    else {
+      this.setVelocity(0,0)
+    }
+    return
+
     // status name
-    this.playerNameText.x = this.x - this.playerNameText.width / 2
-    this.playerNameText.y = this.y - 24
+    // this.playerNameText.x = this.x - this.playerNameText.width / 2
+    // this.playerNameText.y = this.y - 24
 
     if (this.isHurt) {
       this.play('moi-hurt')
       return
     }
 
-    const speed = 100
+    const speed = 50
+    const diagonalSpeed = Math.sqrt(speed * speed / 2)
 
     let x = 0, y = 0
     let attack = false
@@ -144,6 +165,7 @@ export class Player extends Physics.Arcade.Sprite {
       }
       else if (x != 0 || y != 0) {
         this.setFlipX(x < 0)
+        console.log({x, y})
         
         this.play('moi-run', true)
         this.setVelocity(x * speed, y * speed)
@@ -199,6 +221,8 @@ export class Player extends Physics.Arcade.Sprite {
   }
 
   playerAttackStop() {
+    if (!this.isAttacking) return
+
     this.off('animationupdate', this.startHit)
 
     this.isAttacking = false
